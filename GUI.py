@@ -6,14 +6,19 @@ from nsepy.derivatives import get_expiry_date
 import pandas as pd
 import numpy as np
 import math
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt 
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from PyQt5.QtCore import *
 import traceback
+import seaborn as sns   
+
 
 def call_payoff(sT, strike_price, premium):
         return np.where(sT > strike_price, sT - strike_price, 0) - premium
 
-
+def put_payoff(sT, strike_price, premium):
+    return  np.where(sT<strike_price, strike_price - sT, 0) - premium
 
 class MainWindow(QMainWindow):                  
 
@@ -121,12 +126,59 @@ class MainWindow(QMainWindow):
         else:
             long_call_strike_price = rst + 50
 
-        print(long_call_strike_price)
+        print('Long call Strike Price :',long_call_strike_price)
         ldata = ns.get_history(symbol='NIFTY',start=udate,end=udate,index=True,option_type='CE',expiry_date=edate,strike_price=long_call_strike_price)
         long_call_premium = ldata.loc[udate, 'Close']
 
-        sT = np.arange(long_call_strike_price-200,short_call_strike_price+200,50)
-               
+        sT = np.arange(long_call_strike_price-200,short_call_strike_price+300,50)
+
+        bull_call_spread_data = self.bull_call_spread(sT, long_call_strike_price, long_call_premium, short_call_strike_price, short_call_premium)
+        #print(bull_call_spread_data)
+        charts = self.show_charts(bull_call_spread_data)
+
+        
+    def show_charts(self, all_datas):
+        self.data_list = all_datas
+        #this part will create a GUI where I will show the chart and Table containing the DataFrame of the payouts
+        chart = QWidget()
+        grid = QGridLayout()
+        chart.setLayout(grid)
+        self.mdi.addSubWindow(chart)
+        #self.setGeometry(600,300, 1000, 600)
+        
+
+        #canvas and toolbar
+        self.Figure = plt.figure(figsize=(15,5))
+        self.Canvas = FigureCanvas(self.Figure)
+        self.toolbar = NavigationToolbar(self.Canvas, self)
+        grid.addWidget(self.Canvas, 2,0,1,2)
+        grid.addWidget(self.toolbar, 1,0,1,2)
+
+        #creating a table
+        s = self.data_list.shape
+        rows_lenght = s[0]
+        columns_lenght = s[1]
+        self.Table = QTableWidget(self)
+        self.Table.setRowCount(rows_lenght)
+        self.Table.setColumnCount(columns_lenght)
+        grid.addWidget(self.Table, 3,0,1,2)
+
+        #Next Button
+        next_btn = QPushButton('Next', self)
+        next_btn.resize(next_btn.sizeHint())
+        grid.addWidget(next_btn, 0,0)
+        next_btn.clicked.connect(self.plot)
+        #Exit Button
+        exit_btn = QPushButton('Exit', self)
+        exit_btn.resize(exit_btn.sizeHint())
+        exit_btn.clicked.connect(chart.close)
+        grid.addWidget(exit_btn, 0,1)
+
+        chart.show()
+
+    
+        
+    def bull_call_spread(self, sT, long_call_strike_price, long_call_premium, short_call_strike_price, short_call_premium):
         long_call_payoff = call_payoff(sT, long_call_strike_price, long_call_premium)
         
         short_call_payoff = call_payoff(sT, short_call_strike_price, short_call_premium) * -1.0
@@ -138,9 +190,7 @@ class MainWindow(QMainWindow):
                            'Short_Call_Payoff':short_call_payoff,
                            'Bull_Call_Spread':bull_Call_spread})
         df.set_index('Nifty_Spot_Price', inplace=True)
-        
-        
-
+        return df
     
 
     def Wincenter(self):
@@ -148,6 +198,25 @@ class MainWindow(QMainWindow):
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+
+   
+    @pyqtSlot()
+    def plot(self):
+        #plt.clf()
+        sns.set(style="ticks")
+        x = self.data_list
+        x_axis_data = x.index
+        y_axis_data1 = x['Bull_Call_Spread']
+
+        ax = self.Figure.add_subplot(111)
+        ax.spines['bottom'].set_position('zero')
+        self.Figure.suptitle('Bull Call Spread')
+        ax.plot(x_axis_data, y_axis_data1, label = 'Bull Call Spread')
+        ax.set_xlabel('NIFTY Index Values')
+        ax.set_ylabel('Profit and loss')
+        ax.legend(loc='best')
+        sns.despine()
+        self.Canvas.draw()
 
     @pyqtSlot()
     def check(self):
