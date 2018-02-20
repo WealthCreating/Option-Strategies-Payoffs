@@ -25,3 +25,7 @@ Very early stages, I am still trying to figure out how to accept user input, che
 20-02-2018:
 
 Today I added a way to get user input Target and calculated a Bull Spread by going long in approximate ATM Call and going short in Target Call option. This Spread will give highest returns when the Spot Price of Nifty is equal to or higher than the user's target. Right now my code only returns a Dataframe, Later I will find a way to present the same to the user.
+
+21-02-2018
+
+Added a chart to show the Bull Call Spread. Next Target is to find ways to use the same chart to show multiple Dataframes.
