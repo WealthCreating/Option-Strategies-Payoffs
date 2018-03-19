@@ -19,6 +19,7 @@ Neutral Strategies
 
 
 <b>Status of the code:</b>
+Edit: The code now works and has a lot of features added to it. Some of the features takes a while to load, I have not implemented multithreading on purpose because I do not want to user to spam other stuffs while asking the program to get an indicator.
 
 Very early stages, I am still trying to figure out how to accept user input, check if the input is correct and if it is pass the input to another function where the calculations will happen.
 
@@ -40,4 +41,6 @@ Features working:
 
 2. Option Strategies - have only added 2, I still can not decide which all strategies I am going to add to the "Bullish Category" and "Bearish Category"
 
-3 Option Pain along with Put Call Ratio is working completely.
+3. Option Pain along with Put Call Ratio is working completely.
+
+Features that I have plan to add, Customized strike price selection for the various strategies that I will add eventually and also my own proprietory indicator to support the market trend indicators like TRIN, PCR and Option Pain.
