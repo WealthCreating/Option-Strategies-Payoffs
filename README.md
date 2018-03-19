@@ -29,3 +29,15 @@ Today I added a way to get user input Target and calculated a Bull Spread by goi
 21-02-2018
 
 Added a chart to show the Bull Call Spread. Next Target is to find ways to use the same chart to show multiple Dataframes.
+
+
+19-03-2018
+
+The program now works and is based on nsepy module, so all thanks goes to https://github.com/swapniljariwala
+Features working:
+
+1. TRIN Indicator - takes a while to load of course as I had to manually make the Advances to Decline Ratio.
+
+2. Option Strategies - have only added 2, I still can not decide which all strategies I am going to add to the "Bullish Category" and "Bearish Category"
+
+3 Option Pain along with Put Call Ratio is working completely.
